@@ -84,6 +84,8 @@ def handler(msg):
 
 def convertVideoToAudio(videoUrl):
     fileName = wget.download(videoUrl)
+    print(fileName[0:-4])
+    print(fileName[0:-4])
     shell_cmd = "ffmpeg -y -i {0} {1}.wav".format(fileName,fileName[0:-4])
     p = subprocess.Popen(shell_cmd, shell=True,stdout=subprocess.PIPE)
         
@@ -99,10 +101,18 @@ def transcribeAudio(audioFile, lang):
             # reconocimiento (convirtiendo de voz a texto)
             text = r.recognize_google(audio_data) # r.recognize_google(audio_data,language="en")
             
-            #todo-add transcribe
+            if lang in ("en","es","fr"):
+                text = translateText(text, lang)
 
             return text
- 
+
+def translateText(text, lang):
+    translator = Translator(service_urls=[
+      'translate.google.com'
+    ])
+
+    translation = translator.translate(text, dest=lang)
+    return translation
 
 
 MessageLoop(bot,handler).run_as_thread()
